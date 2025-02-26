@@ -49,7 +49,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Theatre.urls'
+ROOT_URLCONF = 'Theatre_app.urls'
 
 TEMPLATES = [
     {
