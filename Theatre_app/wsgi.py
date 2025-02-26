@@ -1,5 +1,5 @@
 """
-WSGI config for Theatre project.
+WSGI config for Theatre_app project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Theatre.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Theatre_app.settings')
 
 application = get_wsgi_application()
