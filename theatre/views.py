@@ -16,12 +16,12 @@ class ActorViewSet(viewsets.ModelViewSet):
     serializer_class = ActorSerializer
 
 
-class CinemaHallViewSet(viewsets.ModelViewSet):
+class TheatreHallViewSet(viewsets.ModelViewSet):
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
 
 
-class MovieViewSet(viewsets.ModelViewSet):
+class PlayViewSet(viewsets.ModelViewSet):
     queryset = Play.objects.all()
     serializer_class = PlaySerializer
 
@@ -35,7 +35,7 @@ class MovieViewSet(viewsets.ModelViewSet):
         return PlaySerializer
 
 
-class MovieSessionViewSet(viewsets.ModelViewSet):
+class PerformanceViewSet(viewsets.ModelViewSet):
     queryset = Performance.objects.all()
     serializer_class = PerformanceSerializer
 
