@@ -13,4 +13,4 @@ router.register("performances", PerformanceViewSet)
 
 urlpatterns = [path("", include(router.urls))]
 
-app_name = "cinema"
+app_name = "theatre"
