@@ -36,7 +36,7 @@ class PlayListSerializer(PlaySerializer):
     )
 
 
-class MovieDetailSerializer(PlaySerializer):
+class PlayDetailSerializer(PlaySerializer):
     genres = GenreSerializer(many=True, read_only=True)
     actors = ActorSerializer(many=True, read_only=True)
 
@@ -68,9 +68,9 @@ class PerformanceListSerializer(PerformanceSerializer):
 
 
 class PerformanceDetailSerializer(PerformanceSerializer):
-    movie = PerformanceListSerializer(many=False, read_only=True)
-    cinema_hall = PerformanceListSerializer(many=False, read_only=True)
+    play = PerformanceListSerializer(many=False, read_only=True)
+    theatre_hall = PerformanceListSerializer(many=False, read_only=True)
 
     class Meta:
         model = Performance
-        fields = ("id", "show_time", "movie", "cinema_hall")
+        fields = ("id", "show_time", "play", "theatre_hall")
