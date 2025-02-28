@@ -5,10 +5,9 @@ from django.db import models
 class Play(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
-    actor = models.ManyToManyField("Actor", related_name="plays",
+    actors = models.ManyToManyField("Actor", related_name="plays",
                                    blank=True)
-    genre = models.ManyToManyField("Genre", related_name="plays",
-                                   blank=True)
+    genres = models.ManyToManyField("Genre", related_name="plays",)
 
     class Meta:
         ordering = ["title"]
