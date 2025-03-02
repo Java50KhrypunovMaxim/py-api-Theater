@@ -102,11 +102,14 @@ class PerformanceViewSet(viewsets.ModelViewSet):
         if play_id_str:
             queryset = queryset.filter(play_id=int(play_id_str))
 
-        return queryset
+        return queryset.distinct()
 
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+    queryset = Reservation.objects.prefetch_related(
+        "tickets__performance__play__movie", "tickets__performance__theatre_hall"
+    )
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -115,3 +118,4 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Reservation.objects.filter(user=self.request.user)
+
