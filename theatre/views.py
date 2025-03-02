@@ -2,10 +2,11 @@ from datetime import datetime
 
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
+from rest_framework.pagination import PageNumberPagination
 from theatre.models import Genre, Actor, TheatreHall, Play, Performance, Reservation
+from theatre.permission import IsAdminOrIfAuthenticatedReadOnly
 from theatre.serializers import GenreSerializer, ActorSerializer, TheatreHallSerializer, PlaySerializer, \
     PlayListSerializer, PlayDetailSerializer, PerformanceSerializer, PerformanceListSerializer, \
     PerformanceDetailSerializer, ReservationSerializer, TheatreHallDetailSerializer, ActorDetailSerializer, \
@@ -22,9 +23,13 @@ class GenreViewSet(mixins.ListModelMixin,
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
-class ActorViewSet(viewsets.ModelViewSet):
+class ActorViewSet(mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   viewsets.GenericViewSet):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
 
@@ -33,9 +38,13 @@ class ActorViewSet(viewsets.ModelViewSet):
         return ActorSerializer
 
 
-class TheatreHallViewSet(viewsets.ModelViewSet):
+class TheatreHallViewSet(mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   viewsets.GenericViewSet):
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
 
@@ -44,9 +53,13 @@ class TheatreHallViewSet(viewsets.ModelViewSet):
         return TheatreHallSerializer
 
 
-class PlayViewSet(viewsets.ModelViewSet):
+class PlayViewSet(ReadOnlyModelViewSet,
+    mixins.CreateModelMixin,
+    GenericViewSet):
     queryset = Play.objects.all()
     serializer_class = PlaySerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -86,6 +99,8 @@ class PlayViewSet(viewsets.ModelViewSet):
 class PerformanceViewSet(viewsets.ModelViewSet):
     queryset = Performance.objects.all()
     serializer_class = PerformanceSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -112,12 +127,23 @@ class PerformanceViewSet(viewsets.ModelViewSet):
 
         return queryset.distinct()
 
-class ReservationViewSet(viewsets.ModelViewSet):
+class OrderPagination(PageNumberPagination):
+    page_size = 10
+    max_page_size = 100
+
+
+class ReservationViewSet(mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet,):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+    pagination_class = OrderPagination
     queryset = Reservation.objects.prefetch_related(
         "tickets__performance__play__movie", "tickets__performance__theatre_hall"
     )
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
 
     def get_serializer_class(self):
         if self.action == "list":
