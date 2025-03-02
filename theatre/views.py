@@ -1,6 +1,9 @@
 from datetime import datetime
 
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 
 from theatre.models import Genre, Actor, TheatreHall, Play, Performance, Reservation
 from theatre.serializers import GenreSerializer, ActorSerializer, TheatreHallSerializer, PlaySerializer, \
@@ -9,9 +12,14 @@ from theatre.serializers import GenreSerializer, ActorSerializer, TheatreHallSer
     ReservationListSerializer
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+
+class GenreViewSet(mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class ActorViewSet(viewsets.ModelViewSet):
