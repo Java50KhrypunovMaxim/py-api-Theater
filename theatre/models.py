@@ -1,7 +1,15 @@
 from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
+from uuid import uuid4
+import pathlib
 
+
+def play_image_path(instance: "Play", filename: str) -> str:
+    filename = (f"{slugify(instance.title)}-{uuid4()}"
+                + pathlib.Path(filename).suffix)
+    return f"upload-image/{filename}"
 
 class Play(models.Model):
     title = models.CharField(max_length=100)
@@ -9,6 +17,7 @@ class Play(models.Model):
     actors = models.ManyToManyField("Actor", related_name="plays",
                                    blank=True)
     genres = models.ManyToManyField("Genre", related_name="plays",)
+    image = models.ImageField(null=True, upload_to=play_image_path)
 
     class Meta:
         ordering = ["title"]
