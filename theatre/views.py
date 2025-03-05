@@ -1,8 +1,9 @@
 from datetime import datetime
-
-from rest_framework import viewsets, mixins
+from rest_framework.decorators import action
+from rest_framework import viewsets, mixins, status
+from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 from rest_framework.pagination import PageNumberPagination
 from theatre.models import Genre, Actor, TheatreHall, Play, Performance, Reservation
@@ -10,8 +11,7 @@ from theatre.permission import IsAdminOrIfAuthenticatedReadOnly
 from theatre.serializers import GenreSerializer, ActorSerializer, TheatreHallSerializer, PlaySerializer, \
     PlayListSerializer, PlayDetailSerializer, PerformanceSerializer, PerformanceListSerializer, \
     PerformanceDetailSerializer, ReservationSerializer, TheatreHallDetailSerializer, ActorDetailSerializer, \
-    ReservationListSerializer
-
+    ReservationListSerializer, PlayImageSerializer
 
 
 class GenreViewSet(mixins.ListModelMixin,
@@ -68,6 +68,9 @@ class PlayViewSet(ReadOnlyModelViewSet,
         if self.action == "retrieve":
             return PlayDetailSerializer
 
+        if self.action == "upload_image":
+            return PlayImageSerializer
+
         return PlaySerializer
 
     @staticmethod
@@ -95,12 +98,27 @@ class PlayViewSet(ReadOnlyModelViewSet,
 
         return queryset.distinct()
 
+    @action(
+        methods=["POST"],
+        detail=True,
+        permission_classes=[IsAdminUser],
+        url_path="upload-image",
+    )
+    def upload_image(self, request, pk=None):
+        play = self.get_object()
+        serializer = self.get_serializer(play, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,
+                            status=status.HTTP_200_OK)
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
 
 class PerformanceViewSet(viewsets.ModelViewSet):
     queryset = Performance.objects.all()
     serializer_class = PerformanceSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    permission_classes = ()
 
     def get_serializer_class(self):
         if self.action == "list":
