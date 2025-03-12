@@ -15,4 +15,6 @@ djangorestframework==3.14.0
 django-debug-toolbar==3.7.0
 drf-spectacular==0.26.5
 Pillow==10.3.0
+psycopg==3.1.12
+psycopg-binary==3.1.12
 
