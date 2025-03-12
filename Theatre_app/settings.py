@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     'drf_spectacular',
     'theatre',
+     "user",
 ]
 
 MIDDLEWARE = [
@@ -78,7 +79,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Theatre_app.wsgi.application'
 
-
+AUTH_USER_MODEL = "user.User"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
