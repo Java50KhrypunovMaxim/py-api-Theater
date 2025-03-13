@@ -153,15 +153,11 @@ class OrderPagination(PageNumberPagination):
 class ReservationViewSet(mixins.ListModelMixin,
     mixins.CreateModelMixin,
     GenericViewSet,):
-    queryset = Reservation.objects.all()
+    queryset = Reservation.objects
     serializer_class = ReservationSerializer
     pagination_class = OrderPagination
-    queryset = Reservation.objects.prefetch_related(
-        "tickets__performance__play__movie", "tickets__performance__theatre_hall"
-    )
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -170,4 +166,7 @@ class ReservationViewSet(mixins.ListModelMixin,
 
     def get_queryset(self):
         return Reservation.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
