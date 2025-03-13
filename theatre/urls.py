@@ -1,7 +1,5 @@
 from django.urls import path, include
 from rest_framework import routers
-
-from theatre.models import Performance
 from theatre.views import GenreViewSet, ActorViewSet, TheatreHallViewSet, PlayViewSet, PerformanceViewSet, \
     ReservationViewSet
 
