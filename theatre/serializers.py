@@ -65,16 +65,17 @@ class PlayDetailSerializer(PlaySerializer):
 class PerformanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Performance
-        fields = ("id", "show_time", "play", "theatre_hall")
+        fields = ("id", "show_time", "play", "theatre_hall", "capacity")
 
 
 class PerformanceListSerializer(PerformanceSerializer):
     play = PlayListSerializer(read_only=True)
     theatre_hall = TheatreHallSerializer(read_only=True)
+    capacity = serializers.IntegerField(source="theatre_hall.capacity", read_only=True)
 
     class Meta:
         model = Performance
-        fields = ("id", "show_time", "play", "theatre_hall")
+        fields = ("id", "show_time", "play", "theatre_hall", "capacity")
 
 
 class PerformanceDetailSerializer(PerformanceSerializer):
@@ -87,30 +88,15 @@ class PerformanceDetailSerializer(PerformanceSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    def validate(self, attrs):
-        data = super(TicketSerializer, self).validate(attrs=attrs)
-        Ticket.validate_ticket(
-            attrs["row"], attrs["seat"], attrs["performance"]
-        )
-        return data
-
-    class Meta:
-        model = Ticket
-        fields = ("row", "seat", "performance")
-
-
-class TicketListSerializer(TicketSerializer):
-    performance = PerformanceListSerializer(read_only=True)
-
     class Meta:
         model = Ticket
         fields = ("id", "row", "seat", "performance")
 
-
-class TicketSeatsSerializer(TicketSerializer):
-    class Meta:
-        model = Ticket
-        fields = ("row", "seat")
+    def validate(self, attrs):
+        Ticket.validate_ticket(
+            attrs["row"], attrs["seat"], attrs["performance"].theatre_hall,
+            serializers.ValidationError)
+        return attrs
 
 
 class ReservationSerializer(serializers.ModelSerializer):
@@ -125,9 +111,13 @@ class ReservationSerializer(serializers.ModelSerializer):
             tickets_data = validated_data.pop("tickets")
             reservation = Reservation.objects.create(**validated_data)
             for ticket_data in tickets_data:
-                Ticket.objects.create(Reservation=reservation, **ticket_data)
+                Ticket.objects.create(reservation=reservation, **ticket_data)
             return reservation
+
+class TicketListSerializer(TicketSerializer):
+    performance = PerformanceSerializer(read_only=True)
 
 
 class ReservationListSerializer(ReservationSerializer):
     tickets = TicketListSerializer(many=True, read_only=True)
+

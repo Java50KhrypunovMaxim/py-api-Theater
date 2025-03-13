@@ -37,6 +37,9 @@ class Performance(models.Model):
     def __str__(self):
         return str(self.id)
 
+    @property
+    def capacity(self):
+        return self.theatre_hall.capacity
 
 class TheatreHall(models.Model):
     name = models.CharField(max_length=100)

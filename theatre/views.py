@@ -114,11 +114,13 @@ class PlayViewSet(ReadOnlyModelViewSet,
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
 
-class PerformanceViewSet(viewsets.ModelViewSet):
+class PerformanceViewSet(mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   viewsets.GenericViewSet):
     queryset = Performance.objects.all()
     serializer_class = PerformanceSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = ()
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -159,14 +161,17 @@ class ReservationViewSet(mixins.ListModelMixin,
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    def get_serializer_class(self):
-        if self.action == "list":
-            return ReservationListSerializer
-        return ReservationSerializer
-
     def get_queryset(self):
-        return Reservation.objects.filter(user=self.request.user)
+        queryset = self.queryset.filter(user=self.request.user)
+        if self.action == "list":
+            queryset = queryset.prefetch_related("tickets__performance__theatre_hall")
+        return queryset.order_by('created_at')
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def get_serializer_class(self):
+        serializer = self.serializer_class
+        if self.action == "list":
+            return ReservationListSerializer
+        return serializer
