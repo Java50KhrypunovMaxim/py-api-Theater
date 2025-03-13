@@ -81,9 +81,10 @@ class Reservation(models.Model):
 class Ticket(models.Model):
     row = models.IntegerField()
     seat = models.IntegerField()
-    performance = models.ForeignKey("Performance", on_delete=models.CASCADE)
-    reservation = models.ForeignKey("Reservation", on_delete=models.CASCADE,
-                                    related_name="tickets")
+    performance = models.ForeignKey(
+        "Performance", on_delete=models.CASCADE, related_name="tickets"
+    )
+    reservation = models.ForeignKey("Reservation", on_delete=models.CASCADE, related_name="tickets")
 
     @staticmethod
     def validate_ticket(row, seat, theatre_hall, error_to_raise):
