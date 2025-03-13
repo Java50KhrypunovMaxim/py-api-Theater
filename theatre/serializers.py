@@ -73,10 +73,14 @@ class PerformanceListSerializer(PerformanceSerializer):
     theatre_hall = TheatreHallSerializer(read_only=True)
     capacity = serializers.IntegerField(source="theatre_hall.capacity", read_only=True)
     tickets_taken =serializers.IntegerField(read_only=True, source="tickets.count")
+    available_seats = serializers.SerializerMethodField()
 
     class Meta:
         model = Performance
-        fields = ("id", "show_time", "play", "theatre_hall", "capacity", "tickets_taken")
+        fields = ("id", "show_time", "play", "theatre_hall", "capacity", "tickets_taken", "available_seats")
+
+    def get_available_seats(self, obj):
+        return obj.theatre_hall.capacity - obj.tickets.count()
 
 
 class PerformanceDetailSerializer(PerformanceSerializer):
