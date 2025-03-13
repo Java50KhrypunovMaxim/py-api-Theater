@@ -1,7 +1,10 @@
 from django.db import transaction
 from rest_framework import serializers
 
-from theatre.models import Genre, Actor, TheatreHall, Play, Performance, Ticket, Reservation
+from theatre.models import (Genre, Actor,
+                            TheatreHall, Play,
+                            Performance, Ticket,
+                            Reservation)
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -71,13 +74,17 @@ class PerformanceSerializer(serializers.ModelSerializer):
 class PerformanceListSerializer(PerformanceSerializer):
     play = PlayListSerializer(read_only=True)
     theatre_hall = TheatreHallSerializer(read_only=True)
-    capacity = serializers.IntegerField(source="theatre_hall.capacity", read_only=True)
-    tickets_taken =serializers.IntegerField(read_only=True, source="tickets.count")
+    capacity = serializers.IntegerField(source="theatre_hall.capacity",
+                                        read_only=True)
+    tickets_taken =serializers.IntegerField(read_only=True,
+                                            source="tickets.count")
     available_seats = serializers.SerializerMethodField()
 
     class Meta:
         model = Performance
-        fields = ("id", "show_time", "play", "theatre_hall", "capacity", "tickets_taken", "available_seats")
+        fields = ("id", "show_time", "play",
+                  "theatre_hall", "capacity",
+                  "tickets_taken", "available_seats")
 
     def get_available_seats(self, obj):
         return obj.theatre_hall.capacity - obj.tickets.count()
@@ -119,10 +126,10 @@ class ReservationSerializer(serializers.ModelSerializer):
                 Ticket.objects.create(reservation=reservation, **ticket_data)
             return reservation
 
+
 class TicketListSerializer(TicketSerializer):
     performance = PerformanceSerializer(read_only=True)
 
 
 class ReservationListSerializer(ReservationSerializer):
     tickets = TicketListSerializer(many=True, read_only=True)
-

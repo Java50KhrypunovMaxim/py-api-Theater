@@ -11,11 +11,12 @@ def play_image_path(instance: "Play", filename: str) -> str:
                 + pathlib.Path(filename).suffix)
     return f"upload-image/{filename}"
 
+
 class Play(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     actors = models.ManyToManyField("Actor", related_name="plays",
-                                   blank=True)
+                                    blank=True)
     genres = models.ManyToManyField("Genre", related_name="plays",)
     image = models.ImageField(null=True, upload_to=play_image_path)
 
@@ -40,6 +41,7 @@ class Performance(models.Model):
     @property
     def capacity(self):
         return self.theatre_hall.capacity
+
 
 class TheatreHall(models.Model):
     name = models.CharField(max_length=100)
@@ -75,16 +77,19 @@ class Genre(models.Model):
 
 class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
 
 
 class Ticket(models.Model):
     row = models.IntegerField()
     seat = models.IntegerField()
-    performance = models.ForeignKey(
-        "Performance", on_delete=models.CASCADE, related_name="tickets"
-    )
-    reservation = models.ForeignKey("Reservation", on_delete=models.CASCADE, related_name="tickets")
+    performance = models.ForeignKey("Performance",
+                                    on_delete=models.CASCADE,
+                                    related_name="tickets")
+    reservation = models.ForeignKey("Reservation",
+                                    on_delete=models.CASCADE,
+                                    related_name="tickets")
 
     @staticmethod
     def validate_ticket(row, seat, theatre_hall, error_to_raise):
@@ -92,12 +97,14 @@ class Ticket(models.Model):
             (row, "row", "rows"),
             (seat, "seat", "seats_in_row"),
         ]:
-            count_attrs = getattr(theatre_hall, theatre_hall_attr_name)
+            count_attrs = getattr(theatre_hall,
+                                  theatre_hall_attr_name)
             if not (1 <= ticket_attr_value <= count_attrs):
                 raise error_to_raise(
                     {
                         ticket_attr_name: f"{ticket_attr_name} "
-                                          f"number must be in available range: "
+                                          f"number must be in "
+                                          f"available range:"
                                           f"(1, {theatre_hall_attr_name}): "
                                           f"(1, {count_attrs})"
                     }

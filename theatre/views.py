@@ -6,12 +6,23 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 from rest_framework.pagination import PageNumberPagination
-from theatre.models import Genre, Actor, TheatreHall, Play, Performance, Reservation
+from theatre.models import (Genre, Actor, TheatreHall,
+                            Play, Performance, Reservation)
 from theatre.permission import IsAdminOrIfAuthenticatedReadOnly
-from theatre.serializers import GenreSerializer, ActorSerializer, TheatreHallSerializer, PlaySerializer, \
-    PlayListSerializer, PlayDetailSerializer, PerformanceSerializer, PerformanceListSerializer, \
-    PerformanceDetailSerializer, ReservationSerializer, TheatreHallDetailSerializer, ActorDetailSerializer, \
-    ReservationListSerializer, PlayImageSerializer
+from theatre.serializers import (GenreSerializer,
+                                 ActorSerializer,
+                                 TheatreHallSerializer,
+                                 PlaySerializer,
+                                 PlayListSerializer,
+                                 PlayDetailSerializer,
+                                 PerformanceSerializer,
+                                 PerformanceListSerializer,
+                                 PerformanceDetailSerializer,
+                                 ReservationSerializer,
+                                 TheatreHallDetailSerializer,
+                                 ActorDetailSerializer,
+                                 ReservationListSerializer,
+                                 PlayImageSerializer)
 
 
 class GenreViewSet(mixins.ListModelMixin,
@@ -39,8 +50,8 @@ class ActorViewSet(mixins.ListModelMixin,
 
 
 class TheatreHallViewSet(mixins.ListModelMixin,
-                   mixins.CreateModelMixin,
-                   viewsets.GenericViewSet):
+                         mixins.CreateModelMixin,
+                         viewsets.GenericViewSet):
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
     authentication_classes = (TokenAuthentication,)
@@ -54,8 +65,8 @@ class TheatreHallViewSet(mixins.ListModelMixin,
 
 
 class PlayViewSet(ReadOnlyModelViewSet,
-    mixins.CreateModelMixin,
-    GenericViewSet):
+                  mixins.CreateModelMixin,
+                  GenericViewSet):
     queryset = Play.objects.all()
     serializer_class = PlaySerializer
     authentication_classes = (TokenAuthentication,)
@@ -114,9 +125,10 @@ class PlayViewSet(ReadOnlyModelViewSet,
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
 
+
 class PerformanceViewSet(mixins.ListModelMixin,
-                   mixins.CreateModelMixin,
-                   viewsets.GenericViewSet):
+                         mixins.CreateModelMixin,
+                         viewsets.GenericViewSet):
     queryset = Performance.objects.all()
     serializer_class = PerformanceSerializer
     authentication_classes = (TokenAuthentication,)
@@ -130,7 +142,6 @@ class PerformanceViewSet(mixins.ListModelMixin,
             return PerformanceDetailSerializer
 
         return PerformanceSerializer
-
 
     def get_queryset(self):
         date = self.request.query_params.get("date")
@@ -147,14 +158,15 @@ class PerformanceViewSet(mixins.ListModelMixin,
 
         return queryset.distinct()
 
+
 class OrderPagination(PageNumberPagination):
     page_size = 10
     max_page_size = 100
 
 
 class ReservationViewSet(mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    GenericViewSet,):
+                         mixins.CreateModelMixin,
+                         GenericViewSet,):
     queryset = Reservation.objects
     serializer_class = ReservationSerializer
     pagination_class = OrderPagination
@@ -164,7 +176,8 @@ class ReservationViewSet(mixins.ListModelMixin,
     def get_queryset(self):
         queryset = self.queryset.filter(user=self.request.user)
         if self.action == "list":
-            queryset = queryset.prefetch_related("tickets__performance__theatre_hall")
+            queryset = queryset.prefetch_related(
+                "tickets__performance__theatre_hall")
         return queryset.order_by('created_at')
 
     def perform_create(self, serializer):
