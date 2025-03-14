@@ -11,9 +11,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-# Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -89,8 +86,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = "user.User"
-# Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
