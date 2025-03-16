@@ -1,10 +1,16 @@
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-vj0&*%j&7ou)1=gn-&bnxd%yr2-i2+@z1uptzi&(foyfj!_dkp'
+load_dotenv()
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY is not set in the environment variables!")
 
 
 DEBUG = True
